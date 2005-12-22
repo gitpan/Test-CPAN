@@ -1,0 +1,9 @@
+Changes
+lib/Test/CPAN.pm
+lib/Test/CPAN/Fake.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Test-CPAN.t
+t/tlib/Test-CPAN-Test-Prereq/Makefile.PL
