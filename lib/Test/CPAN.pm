@@ -8,7 +8,7 @@ use Test::Deep qw(cmp_bag);
 use Exporter qw(import);
 
 our @EXPORT = qw(cpan_depends_ok cpan_depends_ok_force_missing);
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 return 1;
 

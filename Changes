@@ -1,6 +1,8 @@
 Revision history for Perl extension Test::CPAN.
 
-0.01  Mon Dec 19 21:17:39 2005
-	- original version; created by h2xs 1.23 with options
-		-AXP -b 5.6.0 Test::CPAN
+0.02  Thu Dec 29 12:12:12 2005
+    - added "cpanemu" command-line to interactively test modules against CPAN
 
+0.01  Mon Dec 19 21:17:39 2005
+    - original version; created by h2xs 1.23 with options
+        -AXP -b 5.6.0 Test::CPAN

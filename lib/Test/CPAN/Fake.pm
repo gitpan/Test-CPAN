@@ -9,11 +9,10 @@ use Cwd qw(abs_path getcwd);
 use File::Path qw(rmtree mkpath);
 use File::Temp qw(mktemp tempdir);
 use File::Basename;
-use Test::Deep;
 use Exporter qw(import);
 use CPAN::Config;
 
-our @EXPORT = qw(get_prereqs run_with_fake_modules);
+our @EXPORT = qw(get_prereqs run_with_fake_modules dist_dir);
 
 sub run_with_fake_modules (&@);
 
@@ -98,17 +97,21 @@ sub make_fake_module {
     return $pathname;
 }
 
-sub run_with_fake_modules (&@) {
-    my($run, %modules) = @_;
+sub setup_fake_modules {
+    my %modules = @_;
     
     my $fake_dir = tempdir(CLEANUP => 1);
     
     while(my($k, $v) = each(%modules)) {
         make_fake_module($fake_dir, $k, $v);
     }
-    
-    local @INC = ($fake_dir, @INC);
-    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+
+    return $fake_dir;
+}
+
+sub unshift_inc {
+    my $fake_dir = shift;
+    @INC = ($fake_dir, @INC);
     
     # if we use PERL5LIB here, Module::Build usurps our changes...
     if($ENV{PERL5OPT}) {
@@ -116,10 +119,20 @@ sub run_with_fake_modules (&@) {
     } else {
         $ENV{PERL5OPT} = "-I$fake_dir";
     }
-    
+
     if($ENV{DEBUG_TEST_CPAN}) {
         print "PERL5OPT = $ENV{PERL5OPT}";
     }
+}
+
+sub run_with_fake_modules (&@) {
+    my($run, %modules) = @_;
+
+    my $fake_dir = setup_fake_modules(%modules);
+    
+    local @INC = @INC;
+    local $ENV{PERL5OPT} = defined($ENV{PERL5OPT}) ? $ENV{PERL5OPT} : undef;
+    unshift_inc($fake_dir);
     
     $run->();
 }
@@ -144,7 +157,7 @@ sub get_prereqs {
             # we want our old one back when it's done so that our filehandles
             # are restored if they need to be.
 
-            local %ENV = %ENV;
+            local $ENV{DEBUG_TEST_CPAN} = $ENV{DEBUG_TEST_CPAN};
             _wrap('CPAN::Distribution::follow_prereqs', sub { @followed = splice(@_, 3); });
             _wrap('CPAN::Distribution::unsat_prereq', \&_unsat_prereq);
             my $here = getcwd();

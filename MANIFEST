@@ -1,3 +1,4 @@
+bin/cpanemu
 Changes
 lib/Test/CPAN.pm
 lib/Test/CPAN/Fake.pm
